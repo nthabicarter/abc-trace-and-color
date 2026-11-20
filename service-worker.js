@@ -1,4 +1,4 @@
-const CACHE="abc-trace-color-v2-updated";
+const CACHE="abc-trace-color-v3-move-fix";
 const CORE=["./","./index.html","./manifest.webmanifest","./icon-192.png","./icon-512.png"];
 self.addEventListener("install",event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()));});
 self.addEventListener("activate",event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith("abc-trace-color-")&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim()));});

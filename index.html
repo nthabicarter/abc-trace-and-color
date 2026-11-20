@@ -320,12 +320,13 @@ body::after { content:""; position:fixed; left:-5%; right:-5%; bottom:-30px; hei
 .zoom-controls button[aria-pressed="true"]{background:#0a3473;color:#fff;border-color:#0a3473}
 .zoom-controls .zoom-level{font:700 15px system-ui;min-width:56px;text-align:center}
 .zoom-help{font:13px system-ui;color:#4b5563}
-.zoom-viewport{overflow:auto;max-width:100%;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;border-radius:8px;position:relative}
+.zoom-viewport{overflow:auto;width:100%;min-width:0;max-width:100%;max-height:min(76vh,900px);-webkit-overflow-scrolling:touch;overscroll-behavior:contain;border-radius:8px;position:relative}
 .zoom-viewport .sheet1,.zoom-viewport .sheet2{flex:none;max-width:none}
-.zoom-viewport.pan-enabled{cursor:grab;touch-action:none}
+.demo>div{min-width:0}
+.zoom-viewport.pan-enabled{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
 .zoom-viewport.pan-enabled:active{cursor:grabbing}
-.zoom-pan-layer{position:absolute;inset:0;z-index:50;display:none;touch-action:none;cursor:grab}
-.pan-enabled .zoom-pan-layer{display:block}
+.zoom-pan-layer{display:none!important}
+
 @media(max-width:680px){.zoom-controls{gap:6px}.zoom-controls button{padding:11px 12px}.demo{grid-template-columns:minmax(0,1fr)!important}.zoom-viewport{width:100%}}
 </style><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#17366d"><link rel="apple-touch-icon" href="./icon-192.png"></head><body><div id="nojs" style="margin:16px;padding:18px 20px;border:4px solid #111;border-radius:16px;background:#ffdf4d;color:#111;font:700 18px/1.4 system-ui,sans-serif"><b style="font-size:22px">Loading your activity book...</b><br>If this message stays and the pages below are blank, your phone is only previewing the file and not running it. Open it in <b>Chrome</b> (Android) or <b>Safari</b> (iPhone/iPad) instead: tap Share or the three dots, then Open in browser. Opening it from an email preview or a Files preview will not work.</div><div class="shop"><header class="wrap nav"><span class="brand"><i>A</i><span>ABC Trace &amp; Color</span></span></header><section class="sec" id="try" aria-labelledby="try-h">
   <div class="wrap">
@@ -845,21 +846,24 @@ document.querySelectorAll('[data-buy]').forEach((a) => { if (SHOP.url) { a.href 
  document.getElementById('zoomOut').onclick=()=>setZoom(zoom-.5);
  document.getElementById('zoomFit').onclick=()=>setZoom(1);
  panButton.onclick=()=>{pan=!pan;apply()};
- viewports.forEach(({viewport,layer})=>{
+ viewports.forEach(({viewport})=>{
    let drag=null;
-   layer.addEventListener('pointerdown',e=>{
-     e.preventDefault();layer.setPointerCapture(e.pointerId);
+   viewport.addEventListener('pointerdown',e=>{
+     if(!pan)return;
+     e.preventDefault();e.stopImmediatePropagation();
      drag={id:e.pointerId,x:e.clientX,y:e.clientY,left:viewport.scrollLeft,top:viewport.scrollTop};
-   });
-   layer.addEventListener('pointermove',e=>{
-     if(!drag||e.pointerId!==drag.id)return;
+     viewport.setPointerCapture(e.pointerId);
+   },true);
+   viewport.addEventListener('pointermove',e=>{
+     if(!pan||!drag||e.pointerId!==drag.id)return;
+     e.preventDefault();e.stopImmediatePropagation();
      viewport.scrollLeft=drag.left-(e.clientX-drag.x);
      viewport.scrollTop=drag.top-(e.clientY-drag.y);
-   });
-   const stop=()=>{drag=null};
-   layer.addEventListener('pointerup',stop);
-   layer.addEventListener('pointercancel',stop);
-   layer.addEventListener('lostpointercapture',stop);
+   },true);
+   const stop=e=>{if(drag&&e.pointerId===drag.id){e.stopImmediatePropagation();drag=null;}};
+   viewport.addEventListener('pointerup',stop,true);
+   viewport.addEventListener('pointercancel',stop,true);
+   viewport.addEventListener('lostpointercapture',()=>{drag=null});
  });
  window.addEventListener('resize',()=>apply());
  requestAnimationFrame(apply);

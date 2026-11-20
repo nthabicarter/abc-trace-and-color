@@ -1,0 +1,5 @@
+ABC Trace & Color updated offline app
+
+Upload all five files from this ZIP to the ROOT of your existing GitHub repository abc-trace-and-color. Replace existing files when prompted. Do not upload the ZIP itself. Wait for GitHub Pages deployment. Open the site online once on your iPad and phone, then reopen the Home Screen app while online to allow the updated service worker to install and cache. Close and reopen the app, then test with Airplane Mode ON and Wi-Fi OFF. If old content persists, close the app, revisit the live site in Safari, and reload while online.
+
+Note: This ZIP updates the interactive app only; keep the existing PDF/PNG files in your repository if desired.
